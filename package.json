@@ -18,7 +18,7 @@
   "maintainers": [
     "Sam Day <sam.c.day@gmail.com>"
   ],
-  
+
   "engines": { "node": ">= 0.6.0" },
   "dependencies": {
     "glob": ">= 2.0.6",
@@ -31,7 +31,7 @@
     "temp": "~0.4.0",
     "wrench": "~1.3.9"
   },
-  
+
   "repository": {
     "type": "git",
     "url": "https://github.com/libgit2/node-gitteh.git"
@@ -39,7 +39,7 @@
   "bugs": {
     "url": "https://github.com/libgit2/node-gitteh/issues"
   },
-  
+
   "main": "lib/index.js",
   "directories": {
     "src": "src",
@@ -48,7 +48,7 @@
     "example": "examples"
   },
   "scripts": {
-    "preinstall": "mkdir deps/libgit2/build && cd deps/libgit2/build && cmake -D CMAKE_BUILD_TYPE=Release -D BUILD_SHARED_LIBS=false -D BUILD_CLAR=false .. && cmake --build . && cd ../../.. && node-gyp rebuild",
+    "preinstall": "build.sh",
     "test": "mocha"
   }
 }
