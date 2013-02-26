@@ -23,8 +23,6 @@
  * THE SOFTWARE.
  */
 
-#include <v8.h>
-
 #include "error.h"
 
 
