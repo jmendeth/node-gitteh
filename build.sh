@@ -14,4 +14,4 @@ mkdir -p deps/libgit2/build && \
     cmake -D CMAKE_BUILD_TYPE=Release -D BUILD_SHARED_LIBS=false -D BUILD_CLAR=false .. && \
     cmake --build . && \
     cd ../../.. && \
-    node-gyp rebuild
+    node-gyp rebuild;
