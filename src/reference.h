@@ -39,8 +39,10 @@ public:
   Reference(git_reference* ptr);
   ~Reference();
   V8_SCTOR();
+  
+  V8_SGET(IsBranch);
 
-  static V8_SCB(Lookup); //static V8_SCB(LookupSync);
+  static V8_SCB(Lookup); static V8_SCB(LookupSync);
   static V8_SCB(StaticResolve); static V8_SCB(StaticResolveSync);
 
   NODE_STYPE(Reference);

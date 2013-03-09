@@ -49,7 +49,14 @@ Reference::~Reference() {
 
 V8_ESCTOR(Reference) { V8_CTOR_NO_JS }
 
-// TODO: methods go here
+// SOME ACCESSORS
+
+V8_ESGET(Reference, IsBranch) {
+  V8_M_UNWRAP(Reference, info.Holder());
+  return v8u::Bool(git_reference_is_branch(inst->ref));
+}
+
+
 
 // STATIC / FACTORY METHODS
 
@@ -95,6 +102,25 @@ V8_SCB(Reference::Lookup) {
   }
   GITTEH_WORK_CALL(2);
 } GITTEH_END
+
+V8_SCB(Reference::LookupSync) {
+  v8::Local<v8::Object> repo_obj;
+  if (!(args[0]->IsObject() && Repository::HasInstance(repo_obj = v8u::Obj(args[0]))))
+    V8_STHROW(v8u::TypeErr("Repository needed as first argument."));
+
+  git_repository* repo = node::ObjectWrap::Unwrap<Repository>(repo_obj)->repo;
+  v8::String::Utf8Value name (args[1]);
+  GITTEH_SYNC_CSTR(name, cname);
+  
+  git_reference* out;
+  error_info err;
+  int status = git_reference_lookup(&out, repo, cname);
+  delete [] cname;
+  
+  if (status == GIT_OK) return (new Reference(out))->Wrapped();
+  collectErr(status, err);
+  V8_STHROW(composeErr(err));
+}
 
 
 //// Reference.resolve(...)
@@ -161,12 +187,13 @@ V8_SCB(Reference::StaticResolveSync) {
 
 
 NODE_ETYPE(Reference, "Reference") {
+  V8_DEF_GET("branch", IsBranch);
   //TODO
   
   Local<Function> func = templ->GetFunction();
   
   func->Set(Symbol("lookup"), Func(Lookup)->GetFunction());
-//  func->Set(Symbol("lookupSync"), Func(LookupSync)->GetFunction());
+  func->Set(Symbol("lookupSync"), Func(LookupSync)->GetFunction());
   
   func->Set(Symbol("resolve"), Func(StaticResolve)->GetFunction());
   func->Set(Symbol("resolveSync"), Func(StaticResolveSync)->GetFunction());
