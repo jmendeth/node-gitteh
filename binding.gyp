@@ -10,6 +10,7 @@
       , "src/object.cc"
       , "src/oid.cc"
       , "src/reference.cc"
+      , "src/commit.cc"
       , "src/repository.cc"
       ],
 
