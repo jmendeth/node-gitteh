@@ -1,5 +1,12 @@
 # Gitteh
 
+**Important: this README is outdated! I'm carrying a rewrite of [the original  
+Gitteh](https://github.com/libgit2/node-gitteh) here, but it's currently in pre-alpha (i.e. *not usable*).**
+
+------
+------
+------
+
 **NOTE: Gitteh is currently undergoing heavy refactoring/rewriting to both not suck and be compatible with v0.17.0. Watch this space!**
 
 ## What?
