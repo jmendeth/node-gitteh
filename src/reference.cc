@@ -35,6 +35,7 @@ using v8u::Int;
 using v8u::Symbol;
 using v8u::Bool;
 using v8u::Func;
+using v8u::Persist;
 using v8::Object;
 using v8::Local;
 using v8::Persistent;
@@ -65,7 +66,7 @@ V8_ESGET(Reference, IsBranch) {
 
 GITTEH_WORK_PRE(ref_lookup) {
   v8::String::Utf8Value* name;
-  git_repository* repo;
+  Persistent<Object> repo;
   git_reference* out;
   error_info err;
 
@@ -79,16 +80,17 @@ V8_SCB(Reference::Lookup) {
     V8_STHROW(v8u::TypeErr("Repository needed as first argument."));
 
   ref_lookup_req* r = new ref_lookup_req;
-  r->repo = node::ObjectWrap::Unwrap<Repository>(repo_obj)->repo;
+  r->repo = Persist(repo_obj);
   r->name = new v8::String::Utf8Value(args[1]);
 
-  r->cb = v8u::Persist<Function>(v8u::Cast<Function>(args[2]));
+  r->cb = Persist(v8u::Cast<Function>(args[2]));
   GITTEH_WORK_QUEUE(ref_lookup);
 } GITTEH_WORK(ref_lookup) {
   GITTEH_ASYNC_CSTR(r->name, cname);
 
-  int status = git_reference_lookup(&r->out, r->repo, cname);
+  int status = git_reference_lookup(&r->out, node::ObjectWrap::Unwrap<Repository>(r->repo)->repo, cname);
   delete [] cname;
+  r->repo.Dispose();
   if (status == GIT_OK) return;
   collectErr(status, r->err);
   r->out = NULL;
@@ -128,7 +130,7 @@ V8_SCB(Reference::LookupSync) {
 
 GITTEH_WORK_PRE(ref_sresolve) {
   v8::String::Utf8Value* name;
-  git_repository* repo;
+  Persistent<Object> repo;
   git_oid out; bool ok;
   error_info err;
 
@@ -142,16 +144,17 @@ V8_SCB(Reference::StaticResolve) {
     V8_STHROW(v8u::TypeErr("Repository needed as first argument."));
 
   ref_sresolve_req* r = new ref_sresolve_req;
-  r->repo = node::ObjectWrap::Unwrap<Repository>(repo_obj)->repo;
+  r->repo = Persist(repo_obj);
   r->name = new v8::String::Utf8Value(args[1]);
 
-  r->cb = v8u::Persist<Function>(v8u::Cast<Function>(args[2]));
+  r->cb = Persist(v8u::Cast<Function>(args[2]));
   GITTEH_WORK_QUEUE(ref_sresolve);
 } GITTEH_WORK(ref_sresolve) {
   GITTEH_ASYNC_CSTR(r->name, cname);
   
-  int status = git_reference_name_to_id(&r->out, r->repo, cname);
+  int status = git_reference_name_to_id(&r->out, node::ObjectWrap::Unwrap<Repository>(r->repo)->repo, cname);
   delete [] cname;
+  r->repo.Dispose();
   if ((r->ok= status == GIT_OK)) return;
   collectErr(status, r->err);
 } GITTEH_WORK_AFTER(ref_sresolve) {
@@ -190,7 +193,7 @@ V8_SCB(Reference::StaticResolveSync) {
 NODE_ETYPE(Reference, "Reference") {
   V8_DEF_GET("branch", IsBranch);
   //TODO
-  
+
   Local<Function> func = templ->GetFunction();
   
   func->Set(Symbol("lookup"), Func(Lookup)->GetFunction());

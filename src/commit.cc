@@ -34,6 +34,7 @@ using v8u::Int;
 using v8u::Symbol;
 using v8u::Bool;
 using v8u::Func;
+using v8u::Persist;
 using v8::Object;
 using v8::Local;
 using v8::Persistent;
