@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef GITTEH_REFERENCE_H
-#define	GITTEH_REFERENCE_H
+#ifndef GITTEH_COMMIT_H
+#define	GITTEH_COMMIT_H
 
 #include "git2.h"
 
@@ -49,5 +49,5 @@ protected:
 
 };
 
-#endif	/* GITTEH_REFERENCE_H */
+#endif	/* GITTEH_COMMIT_H */
 

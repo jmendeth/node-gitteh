@@ -34,6 +34,7 @@
 #include "reference.h"
 #include "message.h"
 #include "repository.h"
+#include "commit.h"
 
 #define GITTEH_VERSION 0,1,0
 
@@ -77,6 +78,7 @@ NODE_DEF_MAIN() {
   GitObject::init(target);
   Repository::init(target);
   Reference::init(target);
+  Commit::init(target);
 } NODE_DEF_MAIN_END(gitteh)
 
 };
