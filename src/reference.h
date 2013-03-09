@@ -46,7 +46,6 @@ public:
   NODE_STYPE(Reference);
 protected:
   git_reference* const ref;
-  bool invalid;
 };
 
 };

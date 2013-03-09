@@ -41,7 +41,7 @@ using v8::Function;
 
 namespace gitteh {
 
-Reference::Reference(git_reference* ptr): ref(ptr), invalid(false) {}
+Reference::Reference(git_reference* ptr): ref(ptr) {}
 Reference::~Reference() {
   if (invalid) return;
   git_reference_free(ref);

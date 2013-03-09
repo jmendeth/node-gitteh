@@ -32,10 +32,12 @@ namespace gitteh {
 
 class GitObject : public node::ObjectWrap {
 public:
-  GitObject() {}
+  GitObject() : invalid(false) {}
   virtual ~GitObject() {};
   V8_SCTOR();
   NODE_STYPE(GitObject);
+protected:
+  bool invalid;
 };
 
 };
