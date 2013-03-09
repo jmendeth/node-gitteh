@@ -35,6 +35,7 @@ using v8u::Int;
 using v8u::Symbol;
 using v8u::Bool;
 using v8u::Func;
+using v8::Object;
 using v8::Local;
 using v8::Persistent;
 using v8::Function;
@@ -73,7 +74,7 @@ GITTEH_WORK_PRE(ref_lookup) {
 };
 
 V8_SCB(Reference::Lookup) {
-  v8::Local<v8::Object> repo_obj;
+  Local<Object> repo_obj;
   if (!(args[0]->IsObject() && Repository::HasInstance(repo_obj = v8u::Obj(args[0]))))
     V8_STHROW(v8u::TypeErr("Repository needed as first argument."));
 
@@ -104,7 +105,7 @@ V8_SCB(Reference::Lookup) {
 } GITTEH_END
 
 V8_SCB(Reference::LookupSync) {
-  v8::Local<v8::Object> repo_obj;
+  Local<Object> repo_obj;
   if (!(args[0]->IsObject() && Repository::HasInstance(repo_obj = v8u::Obj(args[0]))))
     V8_STHROW(v8u::TypeErr("Repository needed as first argument."));
 
@@ -136,7 +137,7 @@ GITTEH_WORK_PRE(ref_sresolve) {
 };
 
 V8_SCB(Reference::StaticResolve) {
-  v8::Local<v8::Object> repo_obj;
+  Local<Object> repo_obj;
   if (!(args[0]->IsObject() && Repository::HasInstance(repo_obj = v8u::Obj(args[0]))))
     V8_STHROW(v8u::TypeErr("Repository needed as first argument."));
 
@@ -166,7 +167,7 @@ V8_SCB(Reference::StaticResolve) {
 } GITTEH_END
 
 V8_SCB(Reference::StaticResolveSync) {
-  v8::Local<v8::Object> repo_obj;
+  Local<Object> repo_obj;
   if (!(args[0]->IsObject() && Repository::HasInstance(repo_obj = v8u::Obj(args[0]))))
     V8_STHROW(v8u::TypeErr("Repository needed as first argument."));
   
