@@ -69,7 +69,6 @@ V8_SCB(Reference::Lookup) {
   v8::Local<v8::Object> repo_obj;
   if (!(args[0]->IsObject() && Repository::HasInstance(repo_obj = v8u::Obj(args[0]))))
     V8_STHROW(v8u::TypeErr("Repository needed as first argument."));
-  if (!args[2]->IsFunction()) V8_STHROW(v8u::TypeErr("A Function is needed as callback!"));
 
   ref_lookup_req* r = new ref_lookup_req;
   r->repo = node::ObjectWrap::Unwrap<Repository>(repo_obj)->repo;
@@ -114,7 +113,6 @@ V8_SCB(Reference::StaticResolve) {
   v8::Local<v8::Object> repo_obj;
   if (!(args[0]->IsObject() && Repository::HasInstance(repo_obj = v8u::Obj(args[0]))))
     V8_STHROW(v8u::TypeErr("Repository needed as first argument."));
-  if (!args[2]->IsFunction()) V8_STHROW(v8u::TypeErr("A Function is needed as callback!"));
 
   ref_sresolve_req* r = new ref_sresolve_req;
   r->repo = node::ObjectWrap::Unwrap<Repository>(repo_obj)->repo;

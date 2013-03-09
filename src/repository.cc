@@ -86,7 +86,6 @@ V8_SCB(Repository::Discover) {
   int len = args.Length()-1; // don't count the callback
   if (len < 1) V8_STHROW(v8u::RangeErr("Not enough arguments!"));
   if (len > 3) len = 3;
-  if (!args[len]->IsFunction()) V8_STHROW(v8u::TypeErr("A Function is needed as callback!"));
   
   repo_discover_req* r = new repo_discover_req;
   r->start = new v8::String::Utf8Value(args[0]);
@@ -156,7 +155,6 @@ V8_SCB(Repository::Open) {
   int len = args.Length()-1; // don't count the callback
   if (len < 1) V8_STHROW(v8u::RangeErr("Not enough arguments!"));
   if (len > 3) len = 3;
-  if (!args[len]->IsFunction()) V8_STHROW(v8u::TypeErr("A Function is needed as callback!"));
 
   repo_open_req* r = new repo_open_req;
   r->path = new v8::String::Utf8Value(args[0]);
