@@ -137,7 +137,7 @@ V8_CB(Oid::ParseArray) {
   V8_RET(output);
 } V8_CB_END()
 
-V8_ESGET(Oid, IsEmpty) {
+V8_ESGET(Oid, IsEmpty) { //TODO: translate to standard prop
   V8_M_UNWRAP(Oid, info.Holder());
   return v8u::Bool(git_oid_iszero(&inst->oid));
 }

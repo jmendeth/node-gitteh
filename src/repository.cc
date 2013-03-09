@@ -121,7 +121,7 @@ V8_SCB(Repository::Discover) {
 
 V8_SCB(Repository::DiscoverSync) {
   v8::String::Utf8Value start (args[0]);
-  GITTEH_SYNC_CSTR(start, cstart);
+  GITTEH_SYNC_CSTR(start, cstart); //TODO: adapt to path allocation policy
   len += 7; //one for \0, more for "/.git/"
   char* out = new char[len];
   
