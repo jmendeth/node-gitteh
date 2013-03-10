@@ -30,9 +30,6 @@
 
 namespace gitteh {
 
-// Until LibGit2 allows custom-length messages here,
-// all 0x00s in the message will be removed,
-// see `prepare(...)` at `message.cc`.
 V8_SCB(Prettify);
 
 };
