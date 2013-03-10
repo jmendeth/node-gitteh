@@ -88,11 +88,11 @@ V8_SCB(Reference::Lookup) {
 } GITTEH_WORK(ref_lookup) {
   int status = git_reference_lookup(&r->out, node::ObjectWrap::Unwrap<Repository>(r->repo)->repo, **r->name);
   delete r->name;
-  r->repo.Dispose();
   if (status == GIT_OK) return;
   collectErr(status, r->err);
   r->out = NULL;
 } GITTEH_WORK_AFTER(ref_lookup) {
+  r->repo.Dispose();
   v8::Handle<v8::Value> argv [2];
   if (r->out) {
     argv[0] = v8::Null();
@@ -148,10 +148,10 @@ V8_SCB(Reference::StaticResolve) {
 } GITTEH_WORK(ref_sresolve) {
   int status = git_reference_name_to_id(&r->out, node::ObjectWrap::Unwrap<Repository>(r->repo)->repo, **r->name);
   delete r->name;
-  r->repo.Dispose();
   if ((r->ok= status == GIT_OK)) return;
   collectErr(status, r->err);
 } GITTEH_WORK_AFTER(ref_sresolve) {
+  r->repo.Dispose();
   v8::Handle<v8::Value> argv [2];
   if (r->ok) {
     argv[0] = v8::Null();

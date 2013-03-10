@@ -82,11 +82,11 @@ V8_SCB(Commit::Lookup) {
   GITTEH_WORK_QUEUE(commit_lookup);
 } GITTEH_WORK(commit_lookup) {
   int status = git_commit_lookup(&r->out, node::ObjectWrap::Unwrap<Repository>(r->repo)->repo, &r->oid);
-  r->repo.Dispose();
   if (status == GIT_OK) return;
   collectErr(status, r->err);
   r->out = NULL;
 } GITTEH_WORK_AFTER(commit_lookup) {
+  r->repo.Dispose();
   v8::Handle<v8::Value> argv [2];
   if (r->out) {
     argv[0] = v8::Null();
