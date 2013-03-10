@@ -28,6 +28,7 @@
 #include "repository.h"
 #include "common.h"
 #include "error.h"
+#include "oid.h"
 
 
 using v8u::Int;
@@ -56,7 +57,46 @@ V8_ESCTOR(Commit) { V8_CTOR_NO_JS }
 
 //// Commit.lookup(...)
 
-//TODO
+GITTEH_WORK_PRE(commit_lookup) {
+  git_oid oid;
+  Persistent<Object> repo;
+  git_commit* out;
+  error_info err;
+
+  Persistent<Function> cb;
+  uv_work_t req;
+};
+
+V8_SCB(Commit::Lookup) {
+  Local<Object> repo_obj, oid_obj;
+  if (!(args[0]->IsObject() && Repository::HasInstance(repo_obj = v8u::Obj(args[0]))))
+    V8_STHROW(v8u::TypeErr("Repository needed as first argument."));
+  if (!(args[1]->IsObject() && Oid::HasInstance(oid_obj = v8u::Obj(args[1]))))
+    V8_STHROW(v8u::TypeErr("OID needed as second argument."));
+
+  commit_lookup_req* r = new commit_lookup_req;
+  r->repo = Persist(repo_obj);
+  memcpy(r->oid.id, node::ObjectWrap::Unwrap<Oid>(oid_obj)->oid.id, GIT_OID_RAWSZ);
+
+  r->cb = Persist(v8u::Cast<Function>(args[2]));
+  GITTEH_WORK_QUEUE(commit_lookup);
+} GITTEH_WORK(commit_lookup) {
+  int status = git_commit_lookup(&r->out, node::ObjectWrap::Unwrap<Repository>(r->repo)->repo, &r->oid);
+  r->repo.Dispose();
+  if (status == GIT_OK) return;
+  collectErr(status, r->err);
+  r->out = NULL;
+} GITTEH_WORK_AFTER(commit_lookup) {
+  v8::Handle<v8::Value> argv [2];
+  if (r->out) {
+    argv[0] = v8::Null();
+    argv[1] = (new Commit(r->out))->Wrapped();
+  } else {
+    argv[0] = composeErr(r->err);
+    argv[1] = v8::Null();
+  }
+  GITTEH_WORK_CALL(2);
+} GITTEH_END
 
 
 
@@ -65,7 +105,7 @@ NODE_ETYPE(Commit, "Commit") {
   
   Local<Function> func = templ->GetFunction();
   
-//  func->Set(Symbol("lookup"), Func(Lookup)->GetFunction());
+  func->Set(Symbol("lookup"), Func(Lookup)->GetFunction());
 //  func->Set(Symbol("lookupSync"), Func(LookupSync)->GetFunction());
   
 } NODE_TYPE_END()

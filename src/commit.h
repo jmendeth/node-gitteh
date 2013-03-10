@@ -40,7 +40,7 @@ public:
   ~Commit();
   V8_SCTOR();
 
-  //static V8_SCB(Lookup); //static V8_SCB(LookupSync);
+  static V8_SCB(Lookup); //static V8_SCB(LookupSync);
 
   NODE_STYPE(Commit);
 protected:

@@ -60,7 +60,7 @@ public:
   V8_SGET(IsEmpty);
 
   NODE_STYPE(Oid);
-protected:
+
   git_oid oid;
 };
 
