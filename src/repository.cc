@@ -33,6 +33,8 @@ using v8u::Int;
 using v8u::Symbol;
 using v8u::Bool;
 using v8u::Func;
+using v8u::Persist;
+using v8::Object;
 using v8::Local;
 using v8::Persistent;
 using v8::Function;
@@ -93,7 +95,7 @@ V8_SCB(Repository::Discover) {
   r->across_fs = len>=2 ? v8u::Bool(args[1]) : false;
   r->ceiling_dirs = NULL; //FIXME:ceiling
   
-  r->cb = v8u::Persist<Function>(v8u::Cast<Function>(args[len]));
+  r->cb = Persist(v8u::Cast<Function>(args[len]));
   GITTEH_WORK_QUEUE(repo_discover);
 } GITTEH_WORK(repo_discover) { //FIXME: error vs null
   int len = r->start->length()+7; //one for \0, more for "/.git/"
@@ -162,7 +164,7 @@ V8_SCB(Repository::Open) {
     else**/ r->ceiling_dirs = NULL;
   }
 
-  r->cb = v8u::Persist<Function>(v8u::Cast<Function>(args[len]));
+  r->cb = Persist(v8u::Cast<Function>(args[len]));
   GITTEH_WORK_QUEUE(repo_open);
 } GITTEH_WORK(repo_open) {
   int status;
@@ -223,7 +225,7 @@ NODE_ETYPE(Repository, "Repository") {
   func->Set(Symbol("openSync"), Func(OpenSync)->GetFunction());
 
   //ENUM: repository states -- STATE
-  Local<v8::Object> stateHash = v8u::Obj();
+  Local<Object> stateHash = v8u::Obj();
   stateHash->Set(Symbol("NONE"), Int(GIT_REPOSITORY_STATE_NONE));
   stateHash->Set(Symbol("MERGE"), Int(GIT_REPOSITORY_STATE_MERGE));
   stateHash->Set(Symbol("REVERT"), Int(GIT_REPOSITORY_STATE_REVERT));
@@ -237,7 +239,7 @@ NODE_ETYPE(Repository, "Repository") {
   func->Set(Symbol("State"), stateHash);
 
   //FLAG: init() options -- INIT
-  Local<v8::Object> initFlagHash = v8u::Obj();
+  Local<Object> initFlagHash = v8u::Obj();
   initFlagHash->Set(Symbol("BARE"), Int(GIT_REPOSITORY_INIT_BARE));
   initFlagHash->Set(Symbol("NO_REINIT"), Int(GIT_REPOSITORY_INIT_NO_REINIT));
   initFlagHash->Set(Symbol("NO_DOTGIT_DIR"), Int(GIT_REPOSITORY_INIT_NO_DOTGIT_DIR));
@@ -247,14 +249,14 @@ NODE_ETYPE(Repository, "Repository") {
   func->Set(Symbol("InitFlag"), initFlagHash);
 
   //FLAG: init() mode options -- INIT_SHARED
-  Local<v8::Object> initModeHash = v8u::Obj();
+  Local<Object> initModeHash = v8u::Obj();
   initModeHash->Set(Symbol("SHARED_UMASK"), Int(GIT_REPOSITORY_INIT_SHARED_UMASK));
   initModeHash->Set(Symbol("SHARED_GROUP"), Int(GIT_REPOSITORY_INIT_SHARED_GROUP));
   initModeHash->Set(Symbol("SHARED_ALL"), Int(GIT_REPOSITORY_INIT_SHARED_ALL));
   func->Set(Symbol("InitMode"), initModeHash);
 
   //FLAG: open() options -- OPEN
-  Local<v8::Object> openFlagHash = v8u::Obj();
+  Local<Object> openFlagHash = v8u::Obj();
   openFlagHash->Set(Symbol("NO_SEARCH"), Int(GIT_REPOSITORY_OPEN_NO_SEARCH));
   openFlagHash->Set(Symbol("CROSS_FS"), Int(GIT_REPOSITORY_OPEN_CROSS_FS));
   func->Set(Symbol("OpenFlag"), openFlagHash);
