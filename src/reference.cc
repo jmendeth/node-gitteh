@@ -86,10 +86,8 @@ V8_SCB(Reference::Lookup) {
   r->cb = Persist(v8u::Cast<Function>(args[2]));
   GITTEH_WORK_QUEUE(ref_lookup);
 } GITTEH_WORK(ref_lookup) {
-  GITTEH_ASYNC_CSTR(r->name, cname);
-
-  int status = git_reference_lookup(&r->out, node::ObjectWrap::Unwrap<Repository>(r->repo)->repo, cname);
-  delete [] cname;
+  int status = git_reference_lookup(&r->out, node::ObjectWrap::Unwrap<Repository>(r->repo)->repo, **r->name);
+  delete r->name;
   r->repo.Dispose();
   if (status == GIT_OK) return;
   collectErr(status, r->err);
@@ -113,12 +111,10 @@ V8_SCB(Reference::LookupSync) {
 
   git_repository* repo = node::ObjectWrap::Unwrap<Repository>(repo_obj)->repo;
   v8::String::Utf8Value name (args[1]);
-  GITTEH_SYNC_CSTR(name, cname);
   
   git_reference* out;
   error_info err;
-  int status = git_reference_lookup(&out, repo, cname);
-  delete [] cname;
+  int status = git_reference_lookup(&out, repo, *name);
   
   if (status == GIT_OK) return (new Reference(out))->Wrapped();
   collectErr(status, err);
@@ -150,10 +146,8 @@ V8_SCB(Reference::StaticResolve) {
   r->cb = Persist(v8u::Cast<Function>(args[2]));
   GITTEH_WORK_QUEUE(ref_sresolve);
 } GITTEH_WORK(ref_sresolve) {
-  GITTEH_ASYNC_CSTR(r->name, cname);
-  
-  int status = git_reference_name_to_id(&r->out, node::ObjectWrap::Unwrap<Repository>(r->repo)->repo, cname);
-  delete [] cname;
+  int status = git_reference_name_to_id(&r->out, node::ObjectWrap::Unwrap<Repository>(r->repo)->repo, **r->name);
+  delete r->name;
   r->repo.Dispose();
   if ((r->ok= status == GIT_OK)) return;
   collectErr(status, r->err);
@@ -176,12 +170,10 @@ V8_SCB(Reference::StaticResolveSync) {
   
   git_repository* repo = node::ObjectWrap::Unwrap<Repository>(repo_obj)->repo;
   v8::String::Utf8Value name (args[1]);
-  GITTEH_SYNC_CSTR(name, cname);
   
   git_oid oid;
   error_info err;
-  int status = git_reference_name_to_id(&oid, repo, cname);
-  delete [] cname;
+  int status = git_reference_name_to_id(&oid, repo, *name);
   
   if (status == GIT_OK) return (new Oid(oid))->Wrapped();
   collectErr(status, err);

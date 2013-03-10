@@ -96,12 +96,11 @@ V8_SCB(Repository::Discover) {
   r->cb = v8u::Persist<Function>(v8u::Cast<Function>(args[len]));
   GITTEH_WORK_QUEUE(repo_discover);
 } GITTEH_WORK(repo_discover) { //FIXME: error vs null
-  GITTEH_ASYNC_CSTR(r->start, cstart);
-  len += 7; //one for \0, more for "/.git/"
+  int len = r->start->length()+7; //one for \0, more for "/.git/"
   r->out = new char[len];
 
-  int status = git_repository_discover(r->out, len, cstart, r->across_fs, r->ceiling_dirs);
-  delete [] cstart;
+  int status = git_repository_discover(r->out, len, **r->start, r->across_fs, r->ceiling_dirs);
+  delete r->start;
   if (status==GIT_OK) return;
   collectErr(status, r->err);
   delete [] r->out;
@@ -121,15 +120,13 @@ V8_SCB(Repository::Discover) {
 
 V8_SCB(Repository::DiscoverSync) {
   v8::String::Utf8Value start (args[0]);
-  GITTEH_SYNC_CSTR(start, cstart); //TODO: adapt to path allocation policy
-  len += 7; //one for \0, more for "/.git/"
-  char* out = new char[len];
+  int len = start.length()+7; //one for \0, more for "/.git/"
+  char* out = new char[len];//TODO: adapt to path allocation policy
   
   error_info info;
-  int status = git_repository_discover(out, len, cstart, v8u::Bool(args[1]), NULL); //FIXME:ceiling
+  int status = git_repository_discover(out, len, *start, v8u::Bool(args[1]), NULL); //FIXME:ceiling
   
   delete [] out;
-  delete [] cstart;
   if (status == GIT_OK) return v8u::Str(out);
   collectErr(status, info);
   V8_STHROW(composeErr(info));
@@ -168,19 +165,14 @@ V8_SCB(Repository::Open) {
   r->cb = v8u::Persist<Function>(v8u::Cast<Function>(args[len]));
   GITTEH_WORK_QUEUE(repo_open);
 } GITTEH_WORK(repo_open) {
-  GITTEH_ASYNC_CSTR(r->path, cpath);
-
   int status;
-  if (r->ext) status = git_repository_open_ext(&r->out, cpath, r->flags, r->ceiling_dirs);
-  else        status = git_repository_open    (&r->out, cpath);
+  if (r->ext) status = git_repository_open_ext(&r->out, **r->path, r->flags, r->ceiling_dirs);
+  else        status = git_repository_open    (&r->out, **r->path);
 
-  if (status == GIT_OK) {
-    delete [] cpath;
-  } else {
-    collectErr(status, r->err);
-    delete [] cpath;
-    r->out = NULL;
-  }
+  delete r->path;
+  if (status == GIT_OK) return;
+  collectErr(status, r->err);
+  r->out = NULL;
 } GITTEH_WORK_AFTER(repo_open) {
   v8::Handle<v8::Value> argv [2];
   if (r->out) {
@@ -195,7 +187,6 @@ V8_SCB(Repository::Open) {
 
 V8_SCB(Repository::OpenSync) {
   v8::String::Utf8Value path (args[0]);
-  GITTEH_SYNC_CSTR(path, cpath);
   
   int status;
   git_repository* out;
@@ -207,11 +198,10 @@ V8_SCB(Repository::OpenSync) {
     /**if (len > 2) ceiling_dirs = TODO;
     else**/ ceiling_dirs = NULL;
 
-    status = git_repository_open_ext(&out, cpath, flags, ceiling_dirs);
+    status = git_repository_open_ext(&out, *path, flags, ceiling_dirs);
     //if (ceiling_dirs) delete [] ceiling_dirs;
-  } else status = git_repository_open(&out, cpath);
+  } else status = git_repository_open(&out, *path);
   
-  delete [] cpath;
   if (status == GIT_OK) return (new Repository(out))->Wrapped();
   collectErr(status, err);
   V8_STHROW(composeErr(err));
